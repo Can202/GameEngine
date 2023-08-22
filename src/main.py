@@ -25,12 +25,14 @@ class Game(game.Game):
             self.move.y = -1
             self.move.x = 0
         
+        self.btn.image = basic.resize_image(self.btn.image, 20, 20)
         self.btn.position.x += self.move.x * 200 * self.deltaTime
         self.btn.position.y += self.move.y * 200 * self.deltaTime
         self.mouse.print_info()
 
     def draw(self):
         self.btn.draw(self.screen)
+        self.btn.draw_collision(self.screen)
 
 
 

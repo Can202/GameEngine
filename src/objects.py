@@ -1,19 +1,25 @@
 import pygame
 import basic
 
-class NodeImg:
-    def __init__(self, _position, _image) -> None:
-        self.position = _position
-        self.image = _image
-    def draw(self, screen):
-        screen.blit(self.image, self.position)
-
 class NodeRect:
     def __init__(self, _position, _rect, _color) -> None:
         self.position = _position
         self.rect = _rect
         self.color = _color
     def draw(self, screen):
+        pygame.draw.rect(screen, self.color, self.rect)
+
+class NodeImg(NodeRect):
+    def __init__(self, _position, _image) -> None:
+        self.baseimage = _image
+        super().__init__(_position, self.baseimage.get_rect(), (100,100,200))
+        
+        self.image = self.baseimage
+    def update(self, deltaTime):
+        self.rect = self.baseImage.get_rect()
+    def draw(self, screen):
+        screen.blit(self.image, self.position)
+    def draw_collision(self, screen):
         pygame.draw.rect(screen, self.color, self.rect)
 
 class Timer:
