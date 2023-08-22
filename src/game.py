@@ -105,14 +105,14 @@ class Mouse:
         temp_position.x = self.position.x - self.wasDOWNPosition.x
         temp_position.y = self.position.y - self.wasDOWNPosition.y
         if abs(temp_position.x) > abs(temp_position.y):
-            if temp_position.x > R.WIDTH/8:
+            if temp_position.x > R.WIDTH/16:
                 self.SLIDE.x = 1
-            elif temp_position.x < -R.WIDTH/8:
+            elif temp_position.x < -R.WIDTH/16:
                 self.SLIDE.x = -1
         else:
-            if temp_position.y > R.HEIGHT/8:
+            if temp_position.y > R.HEIGHT/16:
                 self.SLIDE.y = 1
-            elif temp_position.y < -R.HEIGHT/8:
+            elif temp_position.y < -R.HEIGHT/16:
                 self.SLIDE.y = -1
 
 
