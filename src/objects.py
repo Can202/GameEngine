@@ -3,23 +3,65 @@ import basic
 import copy
 
 class NodeRect:
-    def __init__(self, _position, _rect, _color) -> None:
-        self.position = _position
+    def __init__(self, _rect, _color) -> None:
         self.rect = _rect
         self.color = _color
     def draw(self, screen):
         pygame.draw.rect(screen, self.color, self.rect)
 
 class NodeImg(NodeRect):
-    def __init__(self, _position, _image) -> None:
-        super().__init__(_position, _image.get_rect(), (100,100,200))
-        
+    def __init__(self, _position, _image, type="C") -> None:
+        super().__init__(_image.get_rect(), (100,100,200))
         self.image = _image
+        if type == "C":
+            self.rect = pygame.Rect(_position.x - _image.get_rect().x/2, _position.y - _image.get_rect().y/2, _image.get_rect().x, _image.get_rect().y)
+        else:
+            self.rect = pygame.Rect(_position.x, _position.y, _image.get_rect().x, _image.get_rect().y)
+        self.positionTL = pygame.Vector2(self.rect.left, self.rect.top)
+        self.positionC = pygame.Vector2(self.rect.centerx, self.rect.centery)
+    
+    def Position (self, value="xy", type="C"):
+        if type == "C":
+            if value == "xy":
+                return self.positionC
+            elif value == "x":
+                return self.positionC.x
+            elif value == "y":
+                return self.positionC.y
+        if type == "TL":
+            if value == "xy":
+                return self.positionTL
+            elif value == "x":
+                return self.positionTL.x
+            elif value == "y":
+                return self.positionTL.y
+
+    def setPosition(self, Vector = pygame.Vector2(0,0),type="C"):
+        if type == "C":
+            self.rect.center = Vector
+        elif type == "TL":
+            self.rect.topleft = Vector
+        self.positionTL = pygame.Vector2(self.rect.left, self.rect.top)
+        self.positionC = pygame.Vector2(self.rect.centerx, self.rect.centery)
+    def setPositionX(self, X = 0,type="C"):
+        if type == "C":
+            self.rect.centerx = X
+        elif type == "TL":
+            self.rect.left = X
+        self.positionTL = pygame.Vector2(self.rect.left, self.rect.top)
+        self.positionC = pygame.Vector2(self.rect.centerx, self.rect.centery)
+    def setPositionY(self, Y = 0,type="C"):
+        if type == "C":
+            self.rect.centery = Y
+        elif type == "TL":
+            self.rect.top = Y
+        self.positionTL = pygame.Vector2(self.rect.left, self.rect.top)
+        self.positionC = pygame.Vector2(self.rect.centerx, self.rect.centery)
 
     def update(self, deltaTime):
         pass
     def draw(self, screen):
-        screen.blit(self.image, self.position)
+        screen.blit(self.image, self.positionTL)
     def draw_collision(self, screen):
         pygame.draw.rect(screen, self.color, self.rect)
 
@@ -45,10 +87,10 @@ class ButtonImg(NodeImg):
                  _image:pygame.image,
                  _imagehover:pygame.image,
                  _imagepressed:pygame.image,
-                 _text:str, _font:pygame.font, _color:pygame.color, _distance:pygame.Vector2):
-        super().__init__(_position, _image)
+                 _text:str, _font:pygame.font, _color:pygame.color, _distance:pygame.Vector2, _type="C"):
+        super().__init__(_position, _image, _type)
         self.distanceText = _distance
-        self.text = Text(_position + _distance, _text, _font, _color)
+        self.text = Text(self.Position("xy", "TL") + _distance, _text, _font, _color)
         self.just_pressed = False
         self.pressed_and_still = False
         self.pressed_and_still_no_position = False
@@ -62,11 +104,8 @@ class ButtonImg(NodeImg):
         self.image_hover = _image
         self.image_pressed = _image
     def update(self, deltaTime, mouse):
-        self.text.position = self.position + self.distanceText
+        self.text.position = self.positionTL + self.distanceText
         self.just_pressed = False
-        self.rect = self.image.get_rect()
-        self.rect.left += self.position.x
-        self.rect.top += self.position.y
         if (self.rect.left < mouse.position.x < self.rect.right) and (self.rect.top < mouse.position.y < self.rect.bottom):
             if basic.platform() != "android":
                 self.image = self.image_hover
