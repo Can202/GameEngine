@@ -27,7 +27,6 @@ class Game(game.Game):
         
         self.btn.position.x += self.move.x * 200 * self.deltaTime
         self.btn.position.y += self.move.y * 200 * self.deltaTime
-
         self.mouse.print_info()
 
     def draw(self):

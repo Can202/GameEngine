@@ -42,9 +42,8 @@ class Game:
                     self.mouse.DOWN = True
                     self.mouse.wasDOWN = True
                 if event.type == pygame.MOUSEBUTTONUP:
-                    if self.mouse.wasDOWN:
-                        self.mouse.wasDOWN = False
-                        self.mouse.isSliding()
+                    self.mouse.wasDOWN = False
+                    self.mouse.wasDOWNPosition = pygame.Vector2(0,0)
                     self.mouse.UP = True
                 if event.type == pygame.MOUSEMOTION:
                     self.mouse.MOTION = True
@@ -56,6 +55,8 @@ class Game:
                 self.mouse.wasDOWNPosition.x = self.mouse.position.x
                 self.mouse.wasDOWNPosition.y = self.mouse.position.y
 
+            if self.mouse.wasDOWN:
+                self.mouse.isSliding()
             self.keys = pygame.key.get_pressed()
 
             self.base_update()
@@ -100,16 +101,18 @@ class Mouse:
         self.wasDOWNPosition = pygame.Vector2(0,0)
 
     def isSliding(self):
-        temp_position = self.position - self.wasDOWNPosition
+        temp_position = pygame.Vector2()
+        temp_position.x = self.position.x - self.wasDOWNPosition.x
+        temp_position.y = self.position.y - self.wasDOWNPosition.y
         if abs(temp_position.x) > abs(temp_position.y):
-            if temp_position.x > R.WIDTH/4:
+            if temp_position.x > R.WIDTH/8:
                 self.SLIDE.x = 1
-            elif temp_position.x < -R.WIDTH/4:
+            elif temp_position.x < -R.WIDTH/8:
                 self.SLIDE.x = -1
         else:
-            if temp_position.y > R.HEIGHT/4:
+            if temp_position.y > R.HEIGHT/8:
                 self.SLIDE.y = 1
-            elif temp_position.y < -R.HEIGHT/4:
+            elif temp_position.y < -R.HEIGHT/8:
                 self.SLIDE.y = -1
 
 
