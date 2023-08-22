@@ -1,5 +1,6 @@
 import pygame
 import basic
+import copy
 
 class NodeRect:
     def __init__(self, _position, _rect, _color) -> None:
@@ -11,12 +12,12 @@ class NodeRect:
 
 class NodeImg(NodeRect):
     def __init__(self, _position, _image) -> None:
-        self.baseimage = _image
-        super().__init__(_position, self.baseimage.get_rect(), (100,100,200))
+        super().__init__(_position, _image.get_rect(), (100,100,200))
         
-        self.image = self.baseimage
+        self.image = _image
+
     def update(self, deltaTime):
-        self.rect = self.baseImage.get_rect()
+        pass
     def draw(self, screen):
         screen.blit(self.image, self.position)
     def draw_collision(self, screen):
@@ -51,6 +52,7 @@ class ButtonImg(NodeImg):
         self.just_pressed = False
         self.pressed_and_still = False
         self.pressed_and_still_no_position = False
+        self.was_pressed_and_still = False
         self.normal_image = self.image
         self.image_hover = _imagehover
         self.image_pressed = _imagepressed
@@ -70,6 +72,8 @@ class ButtonImg(NodeImg):
                 self.image = self.image_hover
             else:
                 self.image = self.normal_image
+            if mouse.wasDOWN:
+                self.was_pressed_and_still = True
             if mouse.DOWN:
                 self.image = self.image_pressed
                 self.just_pressed = True
@@ -77,12 +81,16 @@ class ButtonImg(NodeImg):
                 self.pressed_and_still_no_position = True
             if mouse.UP:
                 self.pressed_and_still = False
+                self.was_pressed_and_still = False
+                
             
         elif (self.rect.left < mouse.position.x < self.rect.right) and (self.rect.top < mouse.position.y < self.rect.bottom):
             if basic.platform() != "android":
                 self.image = self.image_hover
             else:
                 self.image = self.normal_image
+            if mouse.wasDOWN:
+                self.was_pressed_and_still = True
             if mouse.DOWN:
                 self.image = self.image_pressed
                 self.just_pressed = True
@@ -90,8 +98,10 @@ class ButtonImg(NodeImg):
                 self.pressed_and_still_no_position = True
             if mouse.UP:
                 self.pressed_and_still = False
+                self.was_pressed_and_still = False
         else:
             self.pressed_and_still = False
+            self.was_pressed_and_still = False
             self.image = self.normal_image
         if mouse.UP:
             self.pressed_and_still_no_position = False
