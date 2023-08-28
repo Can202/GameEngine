@@ -6,16 +6,23 @@ class NodeRect:
     def __init__(self, _rect, _color) -> None:
         self.rect = _rect
         self.color = _color
-    def draw(self, screen):
-        pygame.draw.rect(screen, self.color, self.rect)
+    def draw(self, screen, camera):
+        #pygame.draw.rect(screen, self.color, self.rect)
+        pygame.draw.rect(screen, self.color, pygame.Rect(
+            camera.getPositionFromCamera(self.positionTL).x,
+            camera.getPositionFromCamera(self.positionTL).y, 
+            self.rect.width, self.rect.height
+            ))
 
 class NodeImg(NodeRect):
     def __init__(self, _position, _image, type="C") -> None:
         super().__init__(_image.get_rect(), (100,100,200))
         self.image = _image
         if type == "C":
+            self.rect = None
             self.rect = pygame.Rect(_position.x - _image.get_rect().x/2, _position.y - _image.get_rect().y/2, _image.get_rect().x, _image.get_rect().y)
         else:
+            self.rect = None
             self.rect = pygame.Rect(_position.x, _position.y, _image.get_rect().x, _image.get_rect().y)
         self.positionTL = pygame.Vector2(self.rect.left, self.rect.top)
         self.positionC = pygame.Vector2(self.rect.centerx, self.rect.centery)
@@ -60,10 +67,14 @@ class NodeImg(NodeRect):
 
     def update(self, deltaTime):
         pass
-    def draw(self, screen):
-        screen.blit(self.image, self.positionTL)
-    def draw_collision(self, screen):
-        pygame.draw.rect(screen, self.color, self.rect)
+    def draw(self, screen, camera):
+        screen.blit(self.image, camera.getPositionFromCamera(self.positionTL))
+    def draw_collision(self, screen, camera):
+        pygame.draw.rect(screen, self.color, pygame.Rect(
+            camera.getPositionFromCamera(self.positionTL).x,
+            camera.getPositionFromCamera(self.positionTL).y, 
+            self.rect.width, self.rect.height
+            ))
 
 class Timer:
     def __init__(self, _count_to) -> None:
@@ -146,9 +157,9 @@ class ButtonImg(NodeImg):
             self.pressed_and_still_no_position = False
 
     
-    def draw(self, screen):
-        super().draw(screen)
-        self.text.draw(screen)
+    def draw(self, screen, camera):
+        super().draw(screen, camera)
+        self.text.draw(screen, camera)
 
 class Text():
     def __init__(self, _position:pygame.Vector2, _text:str, _font:pygame.font, _color:pygame.color):
@@ -157,6 +168,16 @@ class Text():
         self.font = _font
         self.color = _color
 
-    def draw(self, screen):
+    def draw(self, screen, camera):
         text_surface = self.font.render(self.text, True, self.color)
-        screen.blit(text_surface, self.position)
+        screen.blit(text_surface, camera.getPositionFromCamera(self.position))
+
+class Camera():
+    def __init__(self, _position = pygame.Vector2(0,0), _size = pygame.Vector2(0,0)) -> None:
+        self.positionC = _position
+        self.size = _size
+    
+    def getPositionFromCamera(self, objectposition = pygame.Vector2(0,0)):
+        return pygame.Vector2(
+            objectposition.x - (self.positionC.x - self.size.x/2),
+            objectposition.y - (self.positionC.y - self.size.y/2))
